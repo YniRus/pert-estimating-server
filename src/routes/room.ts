@@ -1,10 +1,9 @@
 import { TypedRequestBody } from "@/definitions/common";
 import { Response } from "express";
 import { Router } from "express";
-import {randomUUID} from "node:crypto";
-import {Room} from "@/definitions/room";
-import {getStoragePin} from "@/utils/room";
-import storage from "@/lib/storage";
+import {createRoom} from "@/controllers/room";
+import {requestError} from "@/utils/response";
+import {getRoomAccessUrl} from "@/utils/room";
 
 const router = Router();
 
@@ -13,17 +12,9 @@ type CreateRoomRequest = TypedRequestBody<{
 }>
 
 router.post('/room', async (req: CreateRoomRequest, res: Response) => {
-    const room: Room = {
-        uid: randomUUID(),
-    }
-
-    if (req.body.pin) {
-        room.pin = getStoragePin(req.body.pin)
-    }
-
-    await storage.setItem(`rooms:${room.uid}`, room)
-        .then(() => res.status(200).json({ roomId: room.uid }))
-        .catch((error: Error) => res.status(500).json({ error }))
+    await createRoom(req.body.pin)
+        .then((room) => res.status(200).json({ accessUrl: getRoomAccessUrl(room) }))
+        .catch((error: Error) => res.status(500).json(requestError(error)))
 })
 
 export const roomRouter = router

@@ -1,4 +1,7 @@
+import {UID} from "@/definitions/aliases";
+
 export interface Room {
-    uid: string
+    uid: UID
     pin?: string
+    users: UID[]
 }

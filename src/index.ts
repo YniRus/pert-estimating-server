@@ -1,21 +1,19 @@
 /* --- Express & Middlewares --- */
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 /* --- Server & Socket --- */
 import { Server } from "socket.io";
 import { createServer } from "node:http";
-/* --- Storage --- */
-import { createStorage } from "unstorage";
-import fsLiteDriver from "unstorage/drivers/fs-lite";
 /* --- Utils & Others --- */
 import dotenv from "dotenv";
 import { randomUUID, createHash } from "node:crypto";
 
-import {TypedRequestBody} from "@/definitions/common";
-import {roomRouter} from "@/routes/room";
-import {Room} from "@/definitions/room";
 import storage from "@/lib/storage";
+import {Room} from "@/definitions/room";
+
+import {roomRouter} from "@/routes/room";
 import {authRouter} from "@/routes/auth";
 
 /*
@@ -37,9 +35,10 @@ const io = new Server(server, {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(cors({
     origin: process.env.CLIENT_HOST,
-    credentials : true
+    credentials: true,
 }));
 
 app.get("/", (req: Request, res: Response) => {

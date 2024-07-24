@@ -13,8 +13,7 @@ import { randomUUID, createHash } from "node:crypto";
 import storage from "@/lib/storage";
 import {Room} from "@/definitions/room";
 
-import {roomRouter} from "@/routes/room";
-import {authRouter} from "@/routes/auth";
+import routes from "@/routes";
 
 /*
  * Load up and parse configuration details from
@@ -69,8 +68,7 @@ app.post('/api', (req, res) => {
     res.status(200).json({ result: req.body.text });
 })
 
-app.use(authRouter)
-app.use(roomRouter)
+app.use(routes)
 
 io.on('connection', (socket) => {
     console.log('a user connected');

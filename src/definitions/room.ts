@@ -1,4 +1,4 @@
-import {UID} from "@/definitions/aliases";
+import { UID } from '@/definitions/aliases'
 
 export interface Room {
     uid: UID

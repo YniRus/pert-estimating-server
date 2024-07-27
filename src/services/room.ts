@@ -1,11 +1,11 @@
-import {Room} from "@/definitions/room";
-import {randomUUID} from "node:crypto";
-import {getStoragePin} from "@/utils/room";
-import storage from "@/lib/storage";
-import {UID} from "@/definitions/aliases";
+import { Room } from '@/definitions/room'
+import { randomUUID } from 'node:crypto'
+import { getStoragePin } from '@/utils/room'
+import storage from '@/lib/storage'
+import { UID } from '@/definitions/aliases'
 
 export async function getRoom(uid: UID) {
-    return  await storage.getItem<Room>(`rooms:${uid}`)
+    return await storage.getItem<Room>(`rooms:${uid}`)
 }
 
 export async function createRoom(pin?: string) {

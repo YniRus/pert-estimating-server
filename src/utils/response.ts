@@ -3,6 +3,6 @@ export function requestError(error: Error) {
         error: {
             message: error.message,
             type: error.name,
-        }
+        },
     }
 }

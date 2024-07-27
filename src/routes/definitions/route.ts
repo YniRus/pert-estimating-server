@@ -1,3 +1,3 @@
 export enum BasePath {
-    Room= "/room"
+    Room = '/room',
 }

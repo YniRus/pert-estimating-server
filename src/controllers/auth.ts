@@ -1,9 +1,9 @@
-import {Response} from "express";
-import {getStoragePin} from "@/utils/room";
-import {getRoom, joinRoom} from "@/services/room";
-import {LoginRequest} from "@/routes/definitions/auth";
-import {getRoomUserAuthToken} from "@/utils/auth";
-import {createUser} from "@/services/user";
+import { Response } from 'express'
+import { getStoragePin } from '@/utils/room'
+import { getRoom, joinRoom } from '@/services/room'
+import { LoginRequest } from '@/routes/definitions/auth'
+import { getRoomUserAuthToken } from '@/utils/auth'
+import { createUser } from '@/services/user'
 
 export async function loginHandler(req: LoginRequest, res: Response) {
     const room = await getRoom(req.body.roomId)

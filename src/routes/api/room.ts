@@ -1,8 +1,8 @@
-import {Router} from "express";
-import {createRoomHandler, getRoomHandler} from "@/controllers/room";
-import authMiddleware from "@/middleware/http/auth";
+import { Router } from 'express'
+import { createRoomHandler, getRoomHandler } from '@/controllers/room'
+import authMiddleware from '@/middleware/http/auth'
 
-const roomRouter = Router();
+const roomRouter = Router()
 
 roomRouter.route('/room/:roomId')
     .get(authMiddleware, getRoomHandler)

@@ -1,10 +1,10 @@
-import { createHash } from "node:crypto";
-import {Room} from "@/definitions/room";
+import { createHash } from 'node:crypto'
+import { Room } from '@/definitions/room'
 
 export function getStoragePin(userPin: string) {
     return createHash('sha1')
         .update(userPin)
-        .update(process.env.ROOM_PIN_SALT || "")
+        .update(process.env.ROOM_PIN_SALT || '')
         .digest('hex')
 }
 

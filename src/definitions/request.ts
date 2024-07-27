@@ -1,5 +1,6 @@
-import { Request } from "express"
-import {ParamsDictionary, Query} from "express-serve-static-core"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Request } from 'express'
+import { ParamsDictionary, Query } from 'express-serve-static-core'
 
 export interface TypedRequest<B, Q = Query, P = ParamsDictionary> extends Request<P, any, B, Q> {}
 

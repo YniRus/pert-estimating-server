@@ -1,9 +1,9 @@
-import {NextFunction, Request, Response} from "express";
-import {getRoom} from "@/services/room";
-import {getRoomUserAuthToken} from "@/utils/auth";
-import {AuthMiddlewareLocals} from "@/definitions/response";
+import { NextFunction, Request, Response } from 'express'
+import { getRoom } from '@/services/room'
+import { getRoomUserAuthToken } from '@/utils/auth'
+import { AuthMiddlewareLocals } from '@/definitions/response'
 
-export default async function(req: Request, res: Response, next: NextFunction) {
+export default async function (req: Request, res: Response, next: NextFunction) {
     const authToken = req.cookies.authToken
     const authUserUid = req.cookies.user
     const roomUid = req.params.roomId

@@ -23,5 +23,6 @@ export default ts.config(
         semi: false,
         braceStyle: '1tbs',
         commaDangle: 'always-multiline',
+        arrowParens: true,
     }),
 )

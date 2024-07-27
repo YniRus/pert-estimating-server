@@ -1,7 +1,8 @@
-import {Response} from "express";
-import {Room} from "@/definitions/room";
-import {UID} from "@/definitions/aliases";
+import { Response } from 'express'
+import { Room } from '@/definitions/room'
+import { UID } from '@/definitions/aliases'
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export interface TypedResponse<T extends Record<string, any>> extends Response<any, T> {}
 
 export interface AuthResponse extends TypedResponse<AuthMiddlewareLocals> {}

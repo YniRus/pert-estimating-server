@@ -1,7 +1,7 @@
-import { Router } from "express";
-import {loginHandler} from "@/controllers/auth";
+import { Router } from 'express'
+import { loginHandler } from '@/controllers/auth'
 
-const authRouter = Router();
+const authRouter = Router()
 
 authRouter.route('/login')
     .post(loginHandler)

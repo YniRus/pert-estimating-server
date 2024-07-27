@@ -1,4 +1,4 @@
-import {TypedRequestBody, TypedRequestParams} from "@/definitions/request";
+import { TypedRequestBody, TypedRequestParams } from '@/definitions/request'
 
 export interface CreateRoomRequest extends TypedRequestBody<{
     pin?: string

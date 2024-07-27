@@ -1,7 +1,7 @@
-import {randomUUID} from "node:crypto";
-import {User, UserRole} from "@/definitions/user";
-import storage from "@/lib/storage";
-import {UID} from "@/definitions/aliases";
+import { randomUUID } from 'node:crypto'
+import { User, UserRole } from '@/definitions/user'
+import storage from '@/lib/storage'
+import { UID } from '@/definitions/aliases'
 
 export async function createUser(name: string, role?: UserRole) {
     const user: User = {

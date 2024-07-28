@@ -5,6 +5,6 @@
     "watch": [
         "./*"
     ],
-    "exec": "ts-node -r tsconfig-paths/register src/index.ts",
+    "exec": "node --experimental-specifier-resolution=node --loader ./src/lib/ts-esm-paths-loader.js src/index.ts",
     "ext": "ts,json"
 }

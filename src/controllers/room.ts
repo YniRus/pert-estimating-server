@@ -1,15 +1,15 @@
 import { Response } from 'express'
 import { CreateRoomRequest, GetRoomRequest } from '@/routes/definitions/room'
-import { requestError } from '@/utils/response'
 import { getRoomAccessUrl } from '@/utils/room'
 import { createRoom } from '@/services/room'
 import { AuthResponse } from '@/definitions/response'
 import { getUser } from '@/services/user'
+import http from '@/utils/response/http'
 
 export async function createRoomHandler(req: CreateRoomRequest, res: Response) {
     await createRoom(req.body.pin)
-        .then((room) => res.status(200).json({ accessUrl: getRoomAccessUrl(room) }))
-        .catch((error: Error) => res.status(500).json(requestError(error)))
+        .then((room) => http(res).success({ accessUrl: getRoomAccessUrl(room) }))
+        .catch((error: Error) => http(res).error(error))
 }
 
 export async function getRoomHandler(req: GetRoomRequest, res: AuthResponse) {
@@ -23,5 +23,5 @@ export async function getRoomHandler(req: GetRoomRequest, res: AuthResponse) {
         users,
     }
 
-    res.status(200).json(roomPublicData)
+    http(res).success(roomPublicData)
 }

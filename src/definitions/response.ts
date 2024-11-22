@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { Room } from '@/definitions/room'
-import { UID } from '@/definitions/aliases'
+import { AuthTokenPayload } from '@/definitions/auth'
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export interface TypedResponse<T extends Record<string, any>> extends Response<any, T> {}
@@ -17,6 +17,6 @@ export interface DataMiddlewareLocals {
 
 export interface AuthMiddlewareLocals {
     authToken: string
-    authUserUid: UID
+    authTokenPayload: AuthTokenPayload
     room: Room
 }

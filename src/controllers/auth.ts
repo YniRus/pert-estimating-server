@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { getStoragePin } from '@/utils/room'
 import { getRoom, joinRoom } from '@/services/room'
 import { LoginRequest } from '@/routes/definitions/auth'
-import { getRoomUserAuthToken } from '@/utils/auth'
+import { getAuthToken } from '@/utils/auth'
 import { createUser } from '@/services/user'
 
 export async function loginHandler(req: LoginRequest, res: Response) {
@@ -25,10 +25,13 @@ export async function loginHandler(req: LoginRequest, res: Response) {
     const user = await createUser(req.body.name, req.body.role)
     await joinRoom(room, user.uid)
 
-    const authToken = getRoomUserAuthToken(room, user.uid)
+    const authToken = getAuthToken({
+        user: user.uid,
+        room: room.uid,
+        pin: room.pin,
+    })
 
     res
         .cookie('authToken', authToken)
-        .cookie('user', user.uid)
         .sendStatus(200)
 }

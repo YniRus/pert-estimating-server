@@ -1,24 +1,28 @@
 import { NextFunction, Request, Response } from 'express'
 import { getRoom } from '@/services/room'
-import { getRoomUserAuthToken } from '@/utils/auth'
+import {
+    getRequestAuthToken,
+    getRequestAuthTokenPayload,
+    isAuthTokenPayloadAccessAllowed,
+    isValidAuthTokenPayload,
+} from '@/utils/auth'
 import { AuthMiddlewareLocals } from '@/definitions/response'
 
 export default async function (req: Request, res: Response, next: NextFunction) {
-    const authToken = req.cookies.authToken
-    const authUserUid = req.cookies.user
-    const roomUid = req.params.roomId
+    const authToken = getRequestAuthToken(req)
+    if (!authToken) return res.sendStatus(401)
 
-    if (!roomUid) return res.sendStatus(400)
-    if (!authToken || !authUserUid) return res.sendStatus(403)
+    const authTokenPayload = getRequestAuthTokenPayload(authToken)
+    if (!isValidAuthTokenPayload(authTokenPayload)) return res.sendStatus(400)
 
-    const room = await getRoom(roomUid)
+    const room = await getRoom(authTokenPayload.room)
     if (!room) return res.sendStatus(404)
 
-    if (getRoomUserAuthToken(room, authUserUid) !== authToken) return res.sendStatus(403)
+    if (!isAuthTokenPayloadAccessAllowed(authTokenPayload, room)) return res.sendStatus(403)
 
     const locals: AuthMiddlewareLocals = {
         authToken,
-        authUserUid,
+        authTokenPayload,
         room,
     }
 

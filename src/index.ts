@@ -3,9 +3,9 @@ import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-/* --- Server & Socket --- */
-import { Server } from 'socket.io'
+/* --- Server --- */
 import { createServer } from 'node:http'
+import ws from '@/ws'
 /* --- Utils & Others --- */
 import dotenv from 'dotenv'
 import { randomUUID, createHash } from 'node:crypto'
@@ -24,13 +24,6 @@ dotenv.config()
 
 const app = express()
 const server = createServer(app)
-const io = new Server(server, {
-    cors: {
-        origin: process.env.CLIENT_HOST,
-        credentials: true,
-    },
-    path: '/io',
-})
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -70,20 +63,10 @@ app.post('/api', (req, res) => {
 
 app.use(routes)
 
-io.on('connection', (socket) => {
-    console.log('a user connected')
-
-    socket.emit('test', {
-        msg: 'hello',
-    })
-
-    socket.on('disconnect', () => {
-        console.log('user disconnected')
-    })
-})
-
 /* Start the Express app and listen
  for incoming requests on the specified port */
 server.listen(process.env.APP_PORT, () => {
     console.log(`[server]: Server is running at http://localhost:${process.env.APP_PORT}`)
 })
+
+ws(server)

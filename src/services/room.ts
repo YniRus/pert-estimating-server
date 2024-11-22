@@ -27,3 +27,8 @@ export async function joinRoom(room: Room, userId: UID) {
     room.users.push(userId)
     await storage.setItem(`rooms:${room.uid}`, room)
 }
+
+export async function leaveRoom(room: Room, userId: UID) {
+    room.users.filter((user) => user !== userId)
+    await storage.setItem(`rooms:${room.uid}`, room)
+}

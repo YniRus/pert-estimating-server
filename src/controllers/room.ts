@@ -19,7 +19,7 @@ export async function getRoomHandler(req: GetRoomRequest, res: AuthResponse) {
     )).filter(Boolean)
 
     const roomPublicData = {
-        uid: room.uid,
+        id: room.id,
         users,
     }
 

@@ -34,19 +34,19 @@ app.use(cors({
 }))
 
 app.get('/', (req: Request, res: Response) => {
-    const uid = randomUUID()
+    const id = randomUUID()
     const pin = createHash('sha1')
         .update('Привет Мир!')
         .update('gdg')
         .digest('hex')
-    res.send(`rand: ${uid}. hash ${pin}`)
+    res.send(`rand: ${id}. hash ${pin}`)
 
     const room = {
-        uid: uid,
+        id: id,
         pin: pin,
     }
 
-    storage.setItem(`rooms:${uid}`, room)
+    storage.setItem(`rooms:${id}`, room)
 })
 
 app.get('/storage', async (req: Request, res: Response) => {

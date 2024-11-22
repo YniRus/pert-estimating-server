@@ -2,12 +2,12 @@ import { UID } from '@/definitions/aliases'
 import { User } from '@/definitions/user'
 
 export interface Room {
-    uid: UID
+    id: UID
     pin?: string
     users: UID[]
 }
 
 export interface RoomPopulated {
-    uid: UID
+    id: UID
     users: User[]
 }

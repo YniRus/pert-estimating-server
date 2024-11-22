@@ -22,7 +22,7 @@ export function isValidAuthTokenPayload(payload: string | jwt.JwtPayload | jwt.V
 }
 
 export function isAuthTokenPayloadAccessAllowed(payload: AuthTokenPayload, room: Room) {
-    if (payload.room !== room.uid) return false
+    if (payload.room !== room.id) return false
     if (!room.users.includes(payload.user)) return false
     if (room.pin && payload.pin !== room.pin) return false
 

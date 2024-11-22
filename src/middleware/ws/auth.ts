@@ -30,7 +30,7 @@ export default async function (socket: Socket, next: SocketMiddlewareNextFunctio
     socket.handshake.authToken = authToken
     socket.data = { ...socket.data, authTokenPayload, room }
 
-    socket.join(room.uid)
+    socket.join(room.id)
 
     return next()
 }

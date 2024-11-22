@@ -5,16 +5,16 @@ import { UID } from '@/definitions/aliases'
 
 export async function createUser(name: string, role?: UserRole) {
     const user: User = {
-        uid: randomUUID(),
+        id: randomUUID(),
         name,
         role,
     }
 
-    await storage.setItem(`users:${user.uid}`, user)
+    await storage.setItem(`users:${user.id}`, user)
 
     return user
 }
 
-export async function getUser(uid: UID) {
-    return await storage.getItem<User>(`users:${uid}`)
+export async function getUser(id: UID) {
+    return await storage.getItem<User>(`users:${id}`)
 }

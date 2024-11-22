@@ -23,11 +23,11 @@ export async function loginHandler(req: LoginRequest, res: Response) {
     }
 
     const user = await createUser(req.body.name, req.body.role)
-    await joinRoom(room, user.uid)
+    await joinRoom(room, user.id)
 
     const authToken = getAuthToken({
-        user: user.uid,
-        room: room.uid,
+        user: user.id,
+        room: room.id,
         pin: room.pin,
     })
 

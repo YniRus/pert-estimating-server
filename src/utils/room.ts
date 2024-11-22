@@ -9,5 +9,5 @@ export function getStoragePin(userPin: string) {
 }
 
 export function getRoomAccessUrl(room: Room) {
-    return `${process.env.CLIENT_HOST}/join/${room.uid}${room.pin ? `?pin=${room.pin}` : ''}`
+    return `${process.env.CLIENT_HOST}/join/${room.id}${room.pin ? `?pin=${room.pin}` : ''}`
 }

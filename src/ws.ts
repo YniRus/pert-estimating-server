@@ -3,6 +3,7 @@ import { Server as HttpServer } from 'node:http'
 import cookieParser from '@/middleware/ws/cookie-parser'
 import auth from '@/middleware/ws/auth'
 import useRoomListeners from '@/listeners/room'
+import useAuthListeners from '@/listeners/auth'
 
 export default function (server: HttpServer) {
     const io = new SocketIoServer(server, {
@@ -16,6 +17,7 @@ export default function (server: HttpServer) {
     io.on('connection', (socket) => {
         console.log('a user connected')
 
+        useAuthListeners(io, socket)
         useRoomListeners(io, socket)
 
         socket.on('disconnect', () => {

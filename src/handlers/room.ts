@@ -14,7 +14,7 @@ export default function (io: Server, socket: Socket) {
 
         async getRoomInfo(roomId: UID, callback: SocketCallbackFunction<RoomPopulated>) {
             const room: Room = socket.data.room
-            if (room.id !== roomId) callback(new RequestError(403).response)
+            if (room.id !== roomId) return callback(new RequestError(403).response)
 
             const connectedUserIds = (await io.in(room.id).fetchSockets()).map((roomSocket) => {
                 return roomSocket.data.authTokenPayload.user

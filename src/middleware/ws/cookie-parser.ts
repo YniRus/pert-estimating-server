@@ -12,7 +12,7 @@ declare module 'socket.io/dist/socket' {
 
 export default function (socket: Socket, next: SocketMiddlewareNextFunction) {
     const cookieHeader = socket.request.headers.cookie
-    if (!cookieHeader) return next(new RequestError(400, 'Cookie header not found'))
+    if (!cookieHeader) return next(new RequestError(401, 'Cookie header not found'))
 
     socket.handshake.cookies = cookie.parse(cookieHeader)
     return next()

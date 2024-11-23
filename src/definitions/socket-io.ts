@@ -7,25 +7,12 @@ import { ErrorResponse } from '@/utils/response/response'
 export type SocketMiddlewareNextFunction = (err?: Error) => void
 export type SocketCallbackFunction<T> = (response: T | ErrorResponse) => void
 
-const enum SocketEvent {
-    Room = 'room',
-}
-
-const enum SocketEventType {
-    Query = 'query',
-    Mutation = 'mutation',
-}
-
-type _Event<Event extends SocketEvent, Type extends SocketEventType> = `${Event}:${Type}`
-type Query<Event extends SocketEvent> = _Event<Event, SocketEventType.Query>
-type Mutation<Event extends SocketEvent> = _Event<Event, SocketEventType.Mutation>
-
 interface ServerToClientEvents {
 
 }
 
 export type ClientToServerEvents = {
-    [key in Query<SocketEvent.Room>]: (room: UID, callback: SocketCallbackFunction<RoomPopulated>) => void
+    'query:room': (room: UID, callback: SocketCallbackFunction<RoomPopulated>) => void
 }
 
 interface SocketData {

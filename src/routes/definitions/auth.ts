@@ -7,3 +7,5 @@ export interface LoginRequest extends TypedRequestBody<{
     role?: UserRole
     name: string
 }> {}
+
+export interface LogoutRequest extends TypedRequestBody<null> {}

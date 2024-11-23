@@ -7,6 +7,11 @@ import { User } from '@/definitions/user'
 
 export default function (io: Server, socket: Socket) {
     return {
+        async onConnect() {
+            const user = await getUser(socket.data.authTokenPayload.user)
+            if (user) socket.to(socket.data.room.id).emit('on:user-connected', user)
+        },
+
         async getRoomInfo(roomId: UID, callback: SocketCallbackFunction<RoomPopulated>) {
             const room: Room = socket.data.room
             if (room.id !== roomId) callback(new RequestError(403).response)
@@ -25,6 +30,10 @@ export default function (io: Server, socket: Socket) {
             }
 
             callback(roomPublicData)
+        },
+
+        async beforeDisconnect() {
+            socket.to(socket.data.room.id).emit('on:user-disconnected', socket.data.authTokenPayload.user)
         },
     }
 }

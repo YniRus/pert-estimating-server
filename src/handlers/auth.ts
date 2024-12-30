@@ -1,11 +1,11 @@
 import { Server, Socket, SocketCallbackFunction } from '@/definitions/socket-io'
-import { MyAuthWSResponse } from '@/handlers/definitions/auth'
+import { AuthWSResponse } from '@/handlers/definitions/auth'
 import { getUser } from '@/services/user'
 import { RequestError } from '@/utils/response/response'
 
 export default function (io: Server, socket: Socket) {
     return {
-        async getMyAuth(callback: SocketCallbackFunction<MyAuthWSResponse>) {
+        async getAuth(callback: SocketCallbackFunction<AuthWSResponse>) {
             const user = await getUser(socket.data.authTokenPayload.user)
             if (!user) return callback(new RequestError(403).response)
 

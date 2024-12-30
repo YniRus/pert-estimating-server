@@ -4,7 +4,7 @@ import { AuthTokenPayload } from '@/definitions/auth'
 import type { Server as _Server, Socket as _Socket } from 'socket.io'
 import { ErrorResponse } from '@/utils/response/response'
 import { User } from '@/definitions/user'
-import { MyAuthWSResponse } from '@/handlers/definitions/auth'
+import { AuthWSResponse } from '@/handlers/definitions/auth'
 
 export type SocketMiddlewareNextFunction = (err?: Error) => void
 export type SocketCallbackFunction<T> = (response: T | ErrorResponse) => void
@@ -16,7 +16,7 @@ interface ServerToClientEvents {
 
 interface ClientToServerEvents {
     'query:room': (room: UID, callback: SocketCallbackFunction<RoomPopulated>) => void
-    'query:my-auth': (callback: SocketCallbackFunction<MyAuthWSResponse>) => void
+    'query:auth': (callback: SocketCallbackFunction<AuthWSResponse>) => void
 }
 
 interface ServerSideEvents {}

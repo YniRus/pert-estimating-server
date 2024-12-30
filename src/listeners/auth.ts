@@ -4,5 +4,5 @@ import authHandler from '@/handlers/auth'
 export default function (io: Server, socket: Socket) {
     const handler = authHandler(io, socket)
 
-    socket.on('query:my-auth', handler.getMyAuth)
+    socket.on('query:auth', handler.getAuth)
 }

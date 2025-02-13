@@ -1,33 +1,62 @@
 import { Server, Socket, SocketCallbackFunction } from '@/definitions/socket-io'
 import { getUser } from '@/services/user'
-import { Room, RoomRaw } from '@/definitions/room'
+import { Room } from '@/definitions/room'
 import { UID } from '@/definitions/aliases'
 import { RequestError } from '@/utils/response/response'
-import { User } from '@/definitions/user'
+import { getRoomWithActiveUsers, setEstimatesVisible } from '@/services/room'
 
 export default function (io: Server, socket: Socket) {
+    async function getActiveRoomSockets() {
+        return io.in(socket.data.room.id).fetchSockets()
+    }
+
     return {
         async onConnect() {
-            const user = await getUser(socket.data.authTokenPayload.user)
+            const user = await getUser(socket.data.authTokenPayload.user, socket.data.room.estimatesVisible)
             if (user) socket.to(socket.data.room.id).emit('on:user-connected', user)
         },
 
         async getRoomInfo(roomId: UID, callback: SocketCallbackFunction<Room>) {
-            const room: RoomRaw = socket.data.room
-            if (room.id !== roomId) return callback(new RequestError(403).response)
+            if (socket.data.room.id !== roomId) return callback(new RequestError(403).response)
 
-            const connectedUserIds = (await io.in(room.id).fetchSockets()).map((roomSocket) => {
-                return roomSocket.data.authTokenPayload.user
-            })
+            const roomSockets = await getActiveRoomSockets()
+            const connectedUserIds = roomSockets.map((roomSocket) => roomSocket.data.authTokenPayload.user)
 
-            const users = (await Promise.all(room.users.map((user) => {
-                return getUser(user, user === socket.data.authTokenPayload.user)
-            }))).filter((user): user is User => !!user && connectedUserIds.includes(user.id))
+            const room = await getRoomWithActiveUsers(
+                socket.data.room,
+                connectedUserIds,
+                socket.data.authTokenPayload.user,
+            )
 
-            callback({
-                id: room.id,
-                users,
-            })
+            callback(room)
+        },
+
+        async setRoomEstimatesVisible(estimatesVisible: boolean, callback: SocketCallbackFunction<Room>) {
+            await setEstimatesVisible(socket.data.room, estimatesVisible)
+
+            const roomSockets = await getActiveRoomSockets()
+            const connectedUserIds = roomSockets.map((roomSocket) => roomSocket.data.authTokenPayload.user)
+
+            socket.data.room.estimatesVisible = estimatesVisible
+            // TODO: Не брать состояние room из socket (или постоянно его обновлять)
+            callback(await getRoomWithActiveUsers(
+                socket.data.room,
+                connectedUserIds,
+                socket.data.authTokenPayload.user,
+            ))
+
+            for (const roomSocket of roomSockets) {
+                if (roomSocket.data.authTokenPayload.user === socket.data.authTokenPayload.user) continue
+
+                roomSocket.data.room.estimatesVisible = estimatesVisible
+                const room = await getRoomWithActiveUsers(
+                    roomSocket.data.room,
+                    connectedUserIds,
+                    roomSocket.data.authTokenPayload.user,
+                )
+
+                roomSocket.emit('on:room', room)
+            }
         },
 
         async beforeDisconnect() {

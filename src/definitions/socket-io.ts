@@ -14,12 +14,14 @@ interface ServerToClientEvents {
     'on:user-connected': (user: UserPublic) => void
     'on:user-disconnected': (userId: UID) => void
     'on:estimates': (userId: UID, estimates: Estimates) => void
+    'on:room': (room: Room) => void
 }
 
 interface ClientToServerEvents {
     'query:auth': (callback: SocketCallbackFunction<AuthWSResponse>) => void
     'query:room': (room: UID, callback: SocketCallbackFunction<Room>) => void
     'mutation:estimate': (type: EstimateType, estimate: Estimate) => void
+    'mutation:room-estimates-visible': (estimatesVisible: boolean, callback: SocketCallbackFunction<Room>) => void
 }
 
 interface ServerSideEvents {}

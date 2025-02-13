@@ -1,13 +1,13 @@
 import { Response } from 'express'
 import { getStoragePin } from '@/utils/room'
-import { getRoom, joinRoom, leaveRoom } from '@/services/room'
+import { getRoomRaw, joinRoom, leaveRoom } from '@/services/room'
 import { LoginRequest, LogoutRequest } from '@/routes/definitions/auth'
 import { getAuthToken } from '@/utils/auth'
 import { createUser } from '@/services/user'
 import { AuthResponse } from '@/definitions/response'
 
 export async function loginHandler(req: LoginRequest, res: Response) {
-    const room = await getRoom(req.body.roomId)
+    const room = await getRoomRaw(req.body.roomId)
 
     if (!room) {
         return res.sendStatus(404)
@@ -29,6 +29,7 @@ export async function loginHandler(req: LoginRequest, res: Response) {
     const authToken = getAuthToken({
         user: user.id,
         room: room.id,
+        estimates: user.estimates,
         pin: room.pin,
     })
 

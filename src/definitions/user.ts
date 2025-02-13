@@ -6,9 +6,15 @@ export enum UserRole {
     QA = 'qa',
 }
 
-export interface User {
+export interface UserRaw {
     id: UID
     role?: UserRole
     name: string
+    estimates: string
+}
+
+export interface UserPublic extends Omit<UserRaw, 'estimates'> {}
+
+export interface User extends Omit<UserRaw, 'estimates'> {
     estimates?: Estimates
 }

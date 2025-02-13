@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { getRoom } from '@/services/room'
+import { getRoomRaw } from '@/services/room'
 import {
     getRequestAuthToken,
     getRequestAuthTokenPayload,
@@ -15,7 +15,7 @@ export default async function (req: Request, res: Response, next: NextFunction) 
     const authTokenPayload = getRequestAuthTokenPayload(authToken)
     if (!isValidAuthTokenPayload(authTokenPayload)) return res.sendStatus(400)
 
-    const room = await getRoom(authTokenPayload.room)
+    const room = await getRoomRaw(authTokenPayload.room)
     if (!room) return res.sendStatus(404)
 
     if (!isAuthTokenPayloadAccessAllowed(authTokenPayload, room)) return res.sendStatus(403)

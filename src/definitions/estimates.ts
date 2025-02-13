@@ -1,3 +1,5 @@
+import { UID } from '@/definitions/aliases'
+
 enum EstimateUnit {
     Hours = 'h',
     Days = 'd',
@@ -5,7 +7,7 @@ enum EstimateUnit {
     Months = 'm',
 }
 
-enum EstimateType {
+export enum EstimateType {
     Min = 'min',
     Probable = 'probable',
     Max = 'max',
@@ -16,4 +18,11 @@ export interface Estimate {
     unit: EstimateUnit
 }
 
-export type Estimates = Record<EstimateType, Estimate | undefined>
+export const HIDDEN_ESTIMATE = '*'
+
+export type Estimates = Partial<Record<EstimateType, Estimate | typeof HIDDEN_ESTIMATE>>
+
+export interface EstimatesRaw {
+    id: UID
+    estimates: Estimates
+}

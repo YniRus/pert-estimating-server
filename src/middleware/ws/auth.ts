@@ -1,4 +1,4 @@
-import { getRoom } from '@/services/room'
+import { getRoomRaw } from '@/services/room'
 import {
     getRequestAuthToken,
     getRequestAuthTokenPayload,
@@ -22,7 +22,7 @@ export default async function (socket: Socket, next: SocketMiddlewareNextFunctio
     const authTokenPayload = getRequestAuthTokenPayload(authToken)
     if (!isValidAuthTokenPayload(authTokenPayload)) return next(new RequestError(400))
 
-    const room = await getRoom(authTokenPayload.room)
+    const room = await getRoomRaw(authTokenPayload.room)
     if (!room) return next(new RequestError(404))
 
     if (!isAuthTokenPayloadAccessAllowed(authTokenPayload, room)) return next(new RequestError(403))

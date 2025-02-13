@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { Room } from '@/definitions/room'
+import { RoomRaw } from '@/definitions/room'
 import { AuthTokenPayload } from '@/definitions/auth'
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -18,5 +18,5 @@ export interface DataMiddlewareLocals {
 export interface AuthMiddlewareLocals {
     authToken: string
     authTokenPayload: AuthTokenPayload
-    room: Room
+    room: RoomRaw
 }

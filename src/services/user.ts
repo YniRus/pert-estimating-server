@@ -1,13 +1,15 @@
 import { randomUUID } from 'node:crypto'
-import { User, UserRole } from '@/definitions/user'
+import { User, UserPublic, UserRaw, UserRole } from '@/definitions/user'
 import storage from '@/lib/storage'
 import { UID } from '@/definitions/aliases'
+import { createEstimates, getEstimates } from '@/services/estimate'
 
 export async function createUser(name: string, role?: UserRole) {
-    const user: User = {
+    const user: UserRaw = {
         id: randomUUID(),
         name,
         role,
+        estimates: (await createEstimates()).id,
     }
 
     await storage.setItem(`users:${user.id}`, user)
@@ -15,6 +17,26 @@ export async function createUser(name: string, role?: UserRole) {
     return user
 }
 
-export async function getUser(id: UID) {
-    return await storage.getItem<User>(`users:${id}`)
+export async function getUserRaw(id: UID) {
+    return await storage.getItem<UserRaw>(`users:${id}`)
+}
+
+export async function getUserPublic(id: UID): Promise<UserPublic | null> {
+    const user = await getUserRaw(id)
+
+    if (user) {
+        delete (user as Partial<UserRaw>).estimates
+    }
+
+    return user
+}
+
+export async function getUser(id: UID, withOpenEstimates?: boolean): Promise<User | null> {
+    const user = await getUserRaw(id)
+    if (!user) return user
+
+    return {
+        ...user,
+        estimates: await getEstimates(user.estimates, withOpenEstimates),
+    }
 }

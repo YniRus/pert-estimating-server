@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { Room } from '@/definitions/room'
+import { RoomRaw } from '@/definitions/room'
 
 export function getStoragePin(userPin: string) {
     return createHash('sha1')
@@ -8,6 +8,6 @@ export function getStoragePin(userPin: string) {
         .digest('hex')
 }
 
-export function getRoomAccessUrl(room: Room) {
+export function getRoomAccessUrl(room: RoomRaw) {
     return `${process.env.CLIENT_HOST}/join/${room.id}${room.pin ? `?pin=${room.pin}` : ''}`
 }

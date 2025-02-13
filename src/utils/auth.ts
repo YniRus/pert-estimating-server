@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import jwt from 'jsonwebtoken'
-import { Room } from '@/definitions/room'
+import { RoomRaw } from '@/definitions/room'
 import { AuthTokenPayload } from '@/definitions/auth'
 
 export function getAuthToken(payload: AuthTokenPayload) {
@@ -18,10 +18,10 @@ export function getRequestAuthTokenPayload(authToken: string) {
 }
 
 export function isValidAuthTokenPayload(payload: string | jwt.JwtPayload | jwt.VerifyErrors): payload is AuthTokenPayload {
-    return typeof payload === 'object' && 'room' in payload && 'user' in payload
+    return typeof payload === 'object' && 'room' in payload && 'user' in payload && 'estimates' in payload
 }
 
-export function isAuthTokenPayloadAccessAllowed(payload: AuthTokenPayload, room: Room) {
+export function isAuthTokenPayloadAccessAllowed(payload: AuthTokenPayload, room: RoomRaw) {
     if (payload.room !== room.id) return false
     if (!room.users.includes(payload.user)) return false
     if (room.pin && payload.pin !== room.pin) return false

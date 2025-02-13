@@ -4,6 +4,7 @@ import cookieParser from '@/middleware/ws/cookie-parser'
 import auth from '@/middleware/ws/auth'
 import useRoomListeners from '@/listeners/room'
 import useAuthListeners from '@/listeners/auth'
+import useEstimatesListeners from '@/listeners/estimates'
 
 export default function (server: HttpServer) {
     const io = new SocketIoServer(server, {
@@ -15,10 +16,11 @@ export default function (server: HttpServer) {
     })
 
     io.on('connection', (socket) => {
-        console.log('a user connected')
+        console.log('user connected')
 
         useAuthListeners(io, socket)
         useRoomListeners(io, socket)
+        useEstimatesListeners(io, socket)
 
         socket.on('disconnect', () => {
             console.log('user disconnected')

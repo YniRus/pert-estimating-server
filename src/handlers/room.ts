@@ -1,9 +1,10 @@
 import { Server, Socket, SocketCallbackFunction } from '@/definitions/socket-io'
-import { getUser } from '@/services/user'
+import { getUser, getUserEstimatesIds } from '@/services/user'
 import { Room } from '@/definitions/room'
 import { UID } from '@/definitions/aliases'
 import { RequestError } from '@/utils/response/response'
 import { getRoomWithActiveUsers, setEstimatesVisible } from '@/services/room'
+import { resetEstimates } from '@/services/estimate'
 
 export default function (io: Server, socket: Socket) {
     async function getActiveRoomSockets() {
@@ -49,6 +50,41 @@ export default function (io: Server, socket: Socket) {
                 if (roomSocket.data.authTokenPayload.user === socket.data.authTokenPayload.user) continue
 
                 roomSocket.data.room.estimatesVisible = estimatesVisible
+                const room = await getRoomWithActiveUsers(
+                    roomSocket.data.room,
+                    connectedUserIds,
+                    roomSocket.data.authTokenPayload.user,
+                )
+
+                roomSocket.emit('on:room', room)
+            }
+        },
+
+        async deleteRoomEstimates(callback: SocketCallbackFunction<Room>) {
+            // TODO: Сделать опциональным
+            await setEstimatesVisible(socket.data.room, false)
+            const estimatesIds = await getUserEstimatesIds(socket.data.room.users)
+
+            for (const estimatesId of estimatesIds) {
+                await resetEstimates(estimatesId)
+            }
+
+            const roomSockets = await getActiveRoomSockets()
+            const connectedUserIds = roomSockets.map((roomSocket) => roomSocket.data.authTokenPayload.user)
+
+            // TODO: Убрать дублирующийся код
+            socket.data.room.estimatesVisible = false
+            // TODO: Можно не запрашивать внутри estimates, а проставлять дефолтное состояние
+            callback(await getRoomWithActiveUsers(
+                socket.data.room,
+                connectedUserIds,
+                socket.data.authTokenPayload.user,
+            ))
+
+            for (const roomSocket of roomSockets) {
+                if (roomSocket.data.authTokenPayload.user === socket.data.authTokenPayload.user) continue
+
+                socket.data.room.estimatesVisible = false
                 const room = await getRoomWithActiveUsers(
                     roomSocket.data.room,
                     connectedUserIds,

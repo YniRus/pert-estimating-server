@@ -4,7 +4,7 @@ import { getStoragePin } from '@/utils/room'
 import storage from '@/lib/storage'
 import { UID } from '@/definitions/aliases'
 import { getUser } from '@/services/user'
-import { User } from '@/definitions/user'
+import { truthy } from '@/utils/utils'
 
 export async function getRoomRaw(id: UID) {
     return await storage.getItem<RoomRaw>(`rooms:${id}`)
@@ -27,9 +27,10 @@ export async function getRoomWithActiveUsers(room: RoomRaw, activeUserIds: UID[]
         return room.estimatesVisible ? true : userId === authUserId
     }
 
-    const users = (await Promise.all(room.users.map((userId) => {
-        return getUser(userId, withOpenEstimates(userId))
-    }))).filter((user): user is User => !!user && activeUserIds.includes(user.id))
+    const users = (await Promise.all(room.users
+        .filter((userId) => activeUserIds.includes(userId))
+        .map((userId) => getUser(userId, withOpenEstimates(userId))),
+    )).filter(truthy)
 
     return { ...getRoomPublicByRaw(room), users }
 }

@@ -9,6 +9,7 @@ export default function (io: Server, socket: Socket) {
     socket.on('query:room', handler.getRoomInfo)
 
     socket.on('mutation:room-estimates-visible', handler.setRoomEstimatesVisible)
+    socket.on('mutation:room-delete-estimates', handler.deleteRoomEstimates)
 
     socket.on('disconnecting', handler.beforeDisconnect)
 }

@@ -52,3 +52,7 @@ export async function setEstimate(id: UID, type: EstimateType, estimate: Estimat
 
     return estimates.estimates
 }
+
+export async function resetEstimates(id: UID) {
+    await setEstimateRaw(getEmptyEstimatesRaw(id))
+}

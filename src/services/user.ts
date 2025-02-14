@@ -3,6 +3,7 @@ import { User, UserPublic, UserRaw, UserRole } from '@/definitions/user'
 import storage from '@/lib/storage'
 import { UID } from '@/definitions/aliases'
 import { createEstimates, getEstimates } from '@/services/estimate'
+import { truthy } from '@/utils/utils'
 
 export async function createUser(name: string, role?: UserRole) {
     const user: UserRaw = {
@@ -39,4 +40,10 @@ export async function getUser(id: UID, withOpenEstimates?: boolean): Promise<Use
         ...user,
         estimates: await getEstimates(user.estimates, withOpenEstimates),
     }
+}
+
+export async function getUserEstimatesIds(users: UID[]) {
+    return (await Promise.all(users.map(async (user) => {
+        return (await getUserRaw(user))?.estimates
+    }))).filter(truthy)
 }

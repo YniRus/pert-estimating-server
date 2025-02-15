@@ -15,6 +15,9 @@ export default function (server: HttpServer) {
         path: '/io',
     })
 
+    io.use(cookieParser)
+    io.use(auth)
+
     io.on('connection', (socket) => {
         console.log('user connected')
 
@@ -26,7 +29,4 @@ export default function (server: HttpServer) {
             console.log('user disconnected')
         })
     })
-
-    io.use(cookieParser)
-    io.use(auth)
 }

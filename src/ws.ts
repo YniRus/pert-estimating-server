@@ -8,6 +8,7 @@ import useEstimatesListeners from '@/listeners/estimates'
 
 export default function (server: HttpServer) {
     const io = new SocketIoServer(server, {
+        cookie: true,
         cors: {
             origin: process.env.CLIENT_HOST,
             credentials: true,

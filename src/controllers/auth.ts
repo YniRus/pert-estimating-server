@@ -34,7 +34,7 @@ export async function loginHandler(req: LoginRequest, res: Response) {
     })
 
     res
-        .cookie('authToken', authToken, { sameSite: 'none' })
+        .cookie('authToken', authToken, { sameSite: 'none', secure: true })
         .sendStatus(200)
 }
 

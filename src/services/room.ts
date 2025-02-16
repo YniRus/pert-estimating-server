@@ -45,22 +45,25 @@ export async function createRoom(pin?: string) {
         room.pin = getStoragePin(pin)
     }
 
-    await storage.setItem(`rooms:${room.id}`, room)
-
-    return room
+    return await setRoomRaw(room)
 }
 
 export async function setEstimatesVisible(room: RoomRaw, estimatesVisible: boolean) {
     room.estimatesVisible = estimatesVisible
-    await storage.setItem(`rooms:${room.id}`, room)
+    return await setRoomRaw(room)
 }
 
 export async function joinRoom(room: RoomRaw, userId: UID) {
     room.users.push(userId)
-    await storage.setItem(`rooms:${room.id}`, room)
+    return await setRoomRaw(room)
 }
 
 export async function leaveRoom(room: RoomRaw, userId: UID) {
     room.users = room.users.filter((user) => user !== userId)
+    return await setRoomRaw(room)
+}
+
+async function setRoomRaw(room: RoomRaw) {
     await storage.setItem(`rooms:${room.id}`, room)
+    return room
 }

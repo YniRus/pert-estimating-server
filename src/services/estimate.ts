@@ -41,6 +41,7 @@ export function hideEstimates(estimates: Estimates): Estimates {
 
 async function setEstimateRaw(estimates: EstimatesRaw) {
     await storage.setItem(`estimates:${estimates.id}`, estimates)
+    return estimates
 }
 
 export async function setEstimate(id: UID, type: EstimateType, estimate: Estimate) {
@@ -48,9 +49,7 @@ export async function setEstimate(id: UID, type: EstimateType, estimate: Estimat
 
     estimates.estimates[type] = estimate
 
-    await setEstimateRaw(estimates)
-
-    return estimates.estimates
+    return (await setEstimateRaw(estimates)).estimates
 }
 
 export async function resetEstimates(id: UID) {

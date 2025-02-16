@@ -20,7 +20,7 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
     'query:auth': (callback: SocketCallbackFunction<AuthWSResponse>) => void
     'query:room': (room: UID, callback: SocketCallbackFunction<Room>) => void
-    'mutation:estimate': (type: EstimateType, estimate: Estimate) => void
+    'mutation:estimate': (type: EstimateType, estimate: Estimate, callback: SocketCallbackFunction<true>) => void
     'mutation:room-estimates-visible': (estimatesVisible: boolean, callback: SocketCallbackFunction<Room>) => void
     'mutation:room-delete-estimates': (callback: SocketCallbackFunction<Room>) => void
 }
@@ -29,7 +29,7 @@ interface ServerSideEvents {}
 
 interface SocketData {
     authTokenPayload: AuthTokenPayload
-    room: RoomRaw
+    /* Данные, актуальные только на момент подключение */ room: RoomRaw
 }
 
 export type Socket = _Socket<

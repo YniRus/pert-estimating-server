@@ -3,7 +3,6 @@ import { Server as HttpServer } from 'node:http'
 import cookieParser from '@/middleware/ws/cookie-parser'
 import auth from '@/middleware/ws/auth'
 import useRoomListeners from '@/listeners/room'
-import useAuthListeners from '@/listeners/auth'
 import useEstimatesListeners from '@/listeners/estimates'
 
 export default function (server: HttpServer) {
@@ -21,7 +20,6 @@ export default function (server: HttpServer) {
     io.on('connection', (socket) => {
         console.log('user connected')
 
-        useAuthListeners(io, socket)
         useRoomListeners(io, socket)
         useEstimatesListeners(io, socket)
 

@@ -4,7 +4,6 @@ import { AuthTokenPayload } from '@/definitions/auth'
 import type { Server as _Server, Socket as _Socket } from 'socket.io'
 import { ErrorResponse } from '@/utils/response/response'
 import { UserPublic } from '@/definitions/user'
-import { AuthWSResponse } from '@/handlers/definitions/auth'
 import { Estimate, Estimates, EstimateType } from '@/definitions/estimates'
 
 export type SocketMiddlewareNextFunction = (err?: Error) => void
@@ -18,7 +17,6 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-    'query:auth': (callback: SocketCallbackFunction<AuthWSResponse>) => void
     'query:room': (room: UID, callback: SocketCallbackFunction<Room>) => void
     'mutation:estimate': (type: EstimateType, estimate: Estimate, callback: SocketCallbackFunction<true>) => void
     'mutation:room-estimates-visible': (estimatesVisible: boolean, callback: SocketCallbackFunction<Room>) => void

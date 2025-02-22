@@ -100,7 +100,9 @@ export default function (io: Server, socket: Socket) {
         },
 
         async beforeDisconnect() {
-            socket.to(socket.data.room.id).emit('on:user-disconnected', socket.data.authTokenPayload.user)
+            if (socket.rooms.has(socket.data.room.id)) {
+                socket.to(socket.data.room.id).emit('on:user-disconnected', socket.data.authTokenPayload.user)
+            }
         },
     }
 }

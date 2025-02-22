@@ -20,7 +20,9 @@ export default function (io: Server, socket: Socket) {
                 estimates = hideEstimates(estimates)
             }
 
-            socket.to(socket.data.room.id).emit('on:estimates', socket.data.authTokenPayload.user, estimates)
+            if (socket.rooms.has(socket.data.room.id)) {
+                socket.to(socket.data.room.id).emit('on:estimates', socket.data.authTokenPayload.user, estimates)
+            }
 
             callback(true)
         },

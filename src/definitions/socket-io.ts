@@ -21,6 +21,7 @@ interface ClientToServerEvents {
     'mutation:estimate': (type: EstimateType, estimate: Estimate, callback: SocketCallbackFunction<true>) => void
     'mutation:room-estimates-visible': (estimatesVisible: boolean, callback: SocketCallbackFunction<Room>) => void
     'mutation:room-delete-estimates': (callback: SocketCallbackFunction<Room>) => void
+    'mutation:disconnect': (silent?: boolean) => void
 }
 
 interface ServerSideEvents {}
@@ -28,6 +29,7 @@ interface ServerSideEvents {}
 interface SocketData {
     authTokenPayload: AuthTokenPayload
     /* Данные, актуальные только на момент подключение */ room: RoomRaw
+    silent?: boolean
 }
 
 export type Socket = _Socket<

@@ -18,8 +18,11 @@ export async function getRoomPublic(id: UID): Promise<RoomPublic | null> {
 }
 
 function getRoomPublicByRaw(room: RoomRaw): RoomPublic {
-    delete room.pin
-    return room
+    return {
+        id: room.id,
+        users: room.users,
+        estimatesVisible: room.estimatesVisible,
+    }
 }
 
 export async function getRoomWithActiveUsers(
@@ -46,10 +49,11 @@ export async function createRoom(pin?: string) {
     const room: RoomRaw = {
         id: randomUUID(),
         users: [],
+        createdAt: Date.now(),
     }
 
     if (pin) {
-        room.pin = getStoragePin(pin)
+        room.pin = getStoragePin(pin, room.createdAt)
     }
 
     return await setRoomRaw(room)

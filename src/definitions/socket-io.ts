@@ -1,7 +1,7 @@
 import { UID } from '@/definitions/aliases'
 import { Room, RoomRaw } from '@/definitions/room'
 import { AuthTokenPayload } from '@/definitions/auth'
-import type { Server as _Server, Socket as _Socket } from 'socket.io'
+import type { Server as _Server, Socket as _Socket, RemoteSocket as _RemoteSocket } from 'socket.io'
 import { ErrorResponse } from '@/utils/response/response'
 import { UserPublic } from '@/definitions/user'
 import { Estimate, Estimates, EstimateType } from '@/definitions/estimates'
@@ -38,6 +38,8 @@ export type Socket = _Socket<
     ServerSideEvents,
     SocketData
 >
+
+export type RemoveSocket = _RemoteSocket<ServerToClientEvents, SocketData>
 
 export type Server = _Server<
     ClientToServerEvents,

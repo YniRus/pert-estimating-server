@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { getStoragePin } from '@/utils/room'
 import storage from '@/lib/storage'
 import { UID } from '@/definitions/aliases'
-import { getUser } from '@/services/user'
+import { getUser, UserEstimatesReturnType } from '@/services/user'
 import { truthy } from '@/utils/utils'
 
 export async function getRoomRaw(id: UID) {
@@ -22,14 +22,21 @@ function getRoomPublicByRaw(room: RoomRaw): RoomPublic {
     return room
 }
 
-export async function getRoomWithActiveUsers(room: RoomRaw, activeUserIds: UID[], authUserId: UID): Promise<Room> {
-    const withOpenEstimates = (userId: string) => {
-        return room.estimatesVisible ? true : userId === authUserId
+export async function getRoomWithActiveUsers(
+    room: RoomRaw,
+    activeUserIds: UID[],
+    authUserId: UID,
+    withEmptyEstimates = false,
+): Promise<Room> {
+    const estimatesReturnType = (userId: string) => {
+        if (withEmptyEstimates) return UserEstimatesReturnType.Empty
+        if (room.estimatesVisible || userId === authUserId) return UserEstimatesReturnType.Open
+        return UserEstimatesReturnType.Hidden
     }
 
     const users = (await Promise.all(room.users
         .filter((userId) => activeUserIds.includes(userId))
-        .map((userId) => getUser(userId, withOpenEstimates(userId))),
+        .map((userId) => getUser(userId, estimatesReturnType(userId))),
     )).filter(truthy)
 
     return { ...getRoomPublicByRaw(room), users }

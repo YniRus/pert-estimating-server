@@ -22,6 +22,10 @@ function getEmptyEstimatesRaw(id: UID): EstimatesRaw {
     }
 }
 
+export function getEmptyEstimates(): Estimates {
+    return {}
+}
+
 export async function getEstimates(id: UID, open?: boolean) {
     const estimates = await getEstimatesRaw(id)
 

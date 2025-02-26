@@ -16,7 +16,7 @@ export async function loginHandler(req: LoginRequest, res: Response) {
 
     if (room.pin) {
         if (req.body.pin) {
-            if (![req.body.pin, getStoragePin(req.body.pin)].includes(room.pin)) {
+            if (![req.body.pin, getStoragePin(req.body.pin, room.createdAt)].includes(room.pin)) {
                 return res.sendStatus(400)
             }
         } else {

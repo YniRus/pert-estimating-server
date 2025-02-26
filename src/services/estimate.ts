@@ -18,8 +18,12 @@ async function getEstimatesRaw(id: UID) {
 function getEmptyEstimatesRaw(id: UID): EstimatesRaw {
     return {
         id,
-        estimates: {},
+        estimates: getEmptyEstimates(),
     }
+}
+
+export function getEmptyEstimates(): Estimates {
+    return {}
 }
 
 export async function getEstimates(id: UID, open?: boolean) {

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { User, UserPublic, UserRaw, UserRole } from '@/definitions/user'
 import storage from '@/lib/storage'
 import { UID } from '@/definitions/aliases'
-import { createEstimates, getEstimates } from '@/services/estimate'
+import { createEstimates, getEmptyEstimates, getEstimates } from '@/services/estimate'
 import { truthy } from '@/utils/utils'
 
 export async function createUser(name: string, role?: UserRole) {
@@ -32,14 +32,21 @@ export async function getUserPublic(id: UID): Promise<UserPublic | null> {
     return user
 }
 
-export async function getUser(id: UID, withOpenEstimates?: boolean): Promise<User | null> {
+export enum UserEstimatesReturnType {
+    Empty,
+    Hidden,
+    Open,
+}
+
+export async function getUser(id: UID, estimatesReturnType?: UserEstimatesReturnType): Promise<User | null> {
     const user = await getUserRaw(id)
     if (!user) return user
 
-    return {
-        ...user,
-        estimates: await getEstimates(user.estimates, withOpenEstimates),
-    }
+    const estimates = estimatesReturnType === UserEstimatesReturnType.Empty
+        ? getEmptyEstimates()
+        : await getEstimates(user.estimates, estimatesReturnType === UserEstimatesReturnType.Open)
+
+    return { ...user, estimates }
 }
 
 export async function getUserEstimatesIds(users: UID[]) {

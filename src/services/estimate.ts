@@ -18,7 +18,7 @@ async function getEstimatesRaw(id: UID) {
 function getEmptyEstimatesRaw(id: UID): EstimatesRaw {
     return {
         id,
-        estimates: {},
+        estimates: getEmptyEstimates(),
     }
 }
 

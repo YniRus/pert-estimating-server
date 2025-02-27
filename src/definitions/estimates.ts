@@ -13,12 +13,19 @@ export enum EstimateType {
     Max = 'max',
 }
 
-export interface Estimate {
+export interface ValueUnitEstimate {
     value: number
     unit: EstimateUnit
 }
 
+export enum NonValueUnitEstimate {
+    Chill = 'chill',
+    IDontKnow = 'i-dont-know',
+}
+
 export const HIDDEN_ESTIMATE = '*'
+
+export type Estimate = NonValueUnitEstimate | ValueUnitEstimate
 
 export type Estimates = Partial<Record<EstimateType, Estimate | typeof HIDDEN_ESTIMATE>>
 

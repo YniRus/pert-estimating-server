@@ -8,7 +8,13 @@ import { resetEstimates } from '@/services/estimate'
 
 type CallbackRoomInfoOptions = {
     withBroadcast?: boolean
+    broadcastContext?: RoomInfoContext
     withEmptyEstimates?: boolean
+}
+
+export enum RoomInfoContext {
+    UpdateEstimatesVisible = 'update-estimates-visible',
+    DeleteEstimates = 'delete-estimates',
 }
 
 export default function (io: Server, socket: Socket) {
@@ -49,7 +55,7 @@ export default function (io: Server, socket: Socket) {
                 withEmptyEstimates,
             )
 
-            roomSocket.emit('on:room', roomWithActiveUsers)
+            roomSocket.emit('on:room', roomWithActiveUsers, options?.broadcastContext)
         }
     }
 
@@ -80,6 +86,7 @@ export default function (io: Server, socket: Socket) {
 
             await callbackRoomInfo(room, callback, {
                 withBroadcast: true,
+                broadcastContext: RoomInfoContext.UpdateEstimatesVisible,
             })
         },
 
@@ -97,6 +104,7 @@ export default function (io: Server, socket: Socket) {
 
             await callbackRoomInfo(room, callback, {
                 withBroadcast: true,
+                broadcastContext: RoomInfoContext.DeleteEstimates,
                 withEmptyEstimates: true,
             })
         },

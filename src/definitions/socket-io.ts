@@ -5,6 +5,7 @@ import type { Server as _Server, Socket as _Socket, RemoteSocket as _RemoteSocke
 import { ErrorResponse } from '@/utils/response/response'
 import { UserPublic } from '@/definitions/user'
 import { Estimate, Estimates, EstimateType } from '@/definitions/estimates'
+import { RoomInfoContext } from '@/handlers/room'
 
 export type SocketMiddlewareNextFunction = (err?: Error) => void
 export type SocketCallbackFunction<T> = (response: T | ErrorResponse) => void
@@ -13,7 +14,7 @@ interface ServerToClientEvents {
     'on:user-connected': (user: UserPublic) => void
     'on:user-disconnected': (userId: UID) => void
     'on:estimates': (userId: UID, estimates: Estimates) => void
-    'on:room': (room: Room) => void
+    'on:room': (room: Room, context?: RoomInfoContext) => void
 }
 
 interface ClientToServerEvents {

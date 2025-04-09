@@ -10,7 +10,7 @@ export async function getIsRoomAccessAvailableHandler(req: Request, res: RoomRes
 }
 
 export async function createRoomHandler(req: CreateRoomRequest, res: Response) {
-    createRoom(req.body.pin)
+    createRoom(req.body.pin, req.body.config)
         .then((room) => response(res).success({ accessUrl: getRoomAccessUrl(room) }))
         .catch((error: Error) => response(res).error(500, error.message))
 }

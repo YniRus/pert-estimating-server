@@ -1,4 +1,4 @@
-import { Room, RoomPublic, RoomRaw } from '@/definitions/room'
+import { Room, RoomConfig, RoomPublic, RoomRaw } from '@/definitions/room'
 import { randomUUID } from 'node:crypto'
 import { getStoragePin } from '@/utils/room'
 import storage from '@/lib/storage'
@@ -22,15 +22,23 @@ function getRoomPublicByRaw(room: RoomRaw): RoomPublic {
         id: room.id,
         users: room.users,
         estimatesVisible: room.estimatesVisible,
+        config: room.config,
     }
+}
+
+export interface GetRoomWithActiveUsersOptions {
+    withEmptyEstimates?: boolean
+    withConfig?: boolean
 }
 
 export async function getRoomWithActiveUsers(
     room: RoomRaw,
     activeUserIds: UID[],
     authUserId: UID,
-    withEmptyEstimates = false,
+    options?: GetRoomWithActiveUsersOptions,
 ): Promise<Room> {
+    const { withEmptyEstimates = false, withConfig = false } = options || {}
+
     const estimatesReturnType = (userId: string) => {
         if (withEmptyEstimates) return UserEstimatesReturnType.Empty
         if (room.estimatesVisible || userId === authUserId) return UserEstimatesReturnType.Open
@@ -42,14 +50,18 @@ export async function getRoomWithActiveUsers(
         .map((userId) => getUser(userId, estimatesReturnType(userId))),
     )).filter(truthy)
 
-    return { ...getRoomPublicByRaw(room), users }
+    const roomPublic = getRoomPublicByRaw(room)
+    if (!withConfig) delete roomPublic.config
+
+    return { ...roomPublic, users }
 }
 
-export async function createRoom(pin?: string) {
+export async function createRoom(pin?: string, config?: RoomConfig) {
     const room: RoomRaw = {
         id: randomUUID(),
         users: [],
         createdAt: Date.now(),
+        config, // TODO: validate config
     }
 
     if (pin) {

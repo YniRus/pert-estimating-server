@@ -2,17 +2,8 @@ import { Response } from 'express'
 import { RoomRaw } from '@/definitions/room'
 import { AuthTokenPayload } from '@/definitions/auth'
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export interface TypedResponse<T extends Record<string, any>> extends Response<any, T> {}
-
-export interface AuthResponse extends TypedResponse<AuthMiddlewareLocals> {}
-
-export interface AuthAndDataResponse extends TypedResponse<AuthMiddlewareLocals & DataMiddlewareLocals> {}
-
-export interface DataMiddlewareLocals {
-    user: {
-        name: string
-    }
+export interface RoomMiddlewareLocals {
+    room: RoomRaw
 }
 
 export interface AuthMiddlewareLocals {
@@ -20,3 +11,9 @@ export interface AuthMiddlewareLocals {
     authTokenPayload: AuthTokenPayload
     room: RoomRaw
 }
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export interface TypedResponse<T extends Record<string, any>> extends Response<any, T> {}
+
+export interface RoomResponse extends TypedResponse<RoomMiddlewareLocals> {}
+export interface AuthResponse extends TypedResponse<AuthMiddlewareLocals> {}

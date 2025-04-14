@@ -4,9 +4,6 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import router from '@http/routes'
 import { createServer } from 'node:http'
-import dotenv from 'dotenv'
-
-dotenv.config()
 
 export default function () {
     const app = express()

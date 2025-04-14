@@ -11,10 +11,10 @@ export async function getIsRoomAccessAvailableHandler(req: Request, res: RoomRes
 
 export async function createRoomHandler(req: CreateRoomRequest, res: Response) {
     createRoom(req.body.pin, req.body.config)
-        .then((room) => response(res).success({ accessUrl: getRoomAccessUrl(room) }))
+        .then((room) => response(res).success({ accessUrl: getRoomAccessUrl(room, req.get('origin')) }))
         .catch((error: Error) => response(res).error(500, error.message))
 }
 
 export async function getRoomAccessUrlHandler(req: Request, res: AuthResponse) {
-    response(res).success({ accessUrl: getRoomAccessUrl(res.locals.room) })
+    response(res).success({ accessUrl: getRoomAccessUrl(res.locals.room, req.get('origin')) })
 }

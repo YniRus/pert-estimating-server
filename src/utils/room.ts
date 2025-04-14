@@ -10,6 +10,6 @@ export function getStoragePin(userPin: string, timestamp: Timestamp) {
         .digest('hex')
 }
 
-export function getRoomAccessUrl(room: RoomRaw) {
-    return `${process.env.CLIENT_HOST}/join/${room.id}${room.pin ? `?pin=${room.pin}` : ''}`
+export function getRoomAccessUrl(room: RoomRaw, host?: string) {
+    return `${host || ''}/join/${room.id}${room.pin ? `?pin=${room.pin}` : ''}`
 }

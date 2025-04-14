@@ -4,9 +4,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import router from '@http/routes'
 import { createServer } from 'node:http'
-import dotenv from 'dotenv'
-
-dotenv.config()
+import { getCorsOptions } from '@/lib/cors'
 
 export default function () {
     const app = express()
@@ -15,10 +13,7 @@ export default function () {
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(cookieParser())
-    app.use(cors({
-        origin: process.env.CLIENT_HOST,
-        credentials: true,
-    }))
+    app.use(cors(getCorsOptions()))
     app.use(router)
 
     server.listen(process.env.APP_PORT, () => {

@@ -10,6 +10,7 @@ type CallbackRoomInfoOptions = {
     withBroadcast?: boolean
     broadcastContext?: RoomInfoContext
     withEmptyEstimates?: boolean
+    withConfig?: boolean
 }
 
 export enum RoomInfoContext {
@@ -31,7 +32,7 @@ export default function (io: Server, socket: Socket) {
         callback: SocketCallbackFunction<Room>,
         options?: CallbackRoomInfoOptions,
     ) {
-        const { withBroadcast = false, withEmptyEstimates = false } = options || {}
+        const { withBroadcast = false, withEmptyEstimates = false, withConfig = false } = options || {}
 
         const roomSockets = await getActiveRoomSockets()
         const activeUserIds = getSocketsUserIds(roomSockets)
@@ -40,7 +41,7 @@ export default function (io: Server, socket: Socket) {
             room,
             activeUserIds,
             socket.data.authTokenPayload.user,
-            withEmptyEstimates,
+            { withEmptyEstimates, withConfig: withConfig && !withBroadcast },
         ))
 
         if (!withBroadcast) return
@@ -52,7 +53,7 @@ export default function (io: Server, socket: Socket) {
                 room,
                 activeUserIds,
                 roomSocket.data.authTokenPayload.user,
-                withEmptyEstimates,
+                { withEmptyEstimates },
             )
 
             roomSocket.emit('on:room', roomWithActiveUsers, options?.broadcastContext)
@@ -75,7 +76,9 @@ export default function (io: Server, socket: Socket) {
             const room = await getRoomRaw(roomId)
             if (!room) return callback(new RequestError(404).response)
 
-            await callbackRoomInfo(room, callback)
+            await callbackRoomInfo(room, callback, {
+                withConfig: true,
+            })
         },
 
         async setRoomEstimatesVisible(estimatesVisible: boolean, callback: SocketCallbackFunction<Room>) {

@@ -6,13 +6,11 @@ import auth from '@ws/middleware/auth'
 import useServiceListeners from '@ws/listeners/service'
 import useRoomListeners from '@ws/listeners/room'
 import useEstimatesListeners from '@ws/listeners/estimates'
+import { getCorsOptions } from '@/lib/cors'
 
 export default function (server: HttpServer) {
     const io = new SocketIoServer(server, {
-        cors: {
-            origin: process.env.CLIENT_HOST,
-            credentials: true,
-        },
+        cors: getCorsOptions(),
         path: '/io',
     })
 

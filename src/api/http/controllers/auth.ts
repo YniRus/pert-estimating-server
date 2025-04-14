@@ -1,28 +1,13 @@
-import { Request, Response } from 'express'
-import { getStoragePin } from '@/utils/room'
-import { getRoomRaw, joinRoom, leaveRoom } from '@/services/room'
+import { Request } from 'express'
+import { joinRoom, leaveRoom } from '@/services/room'
 import { LoginRequest, LogoutRequest } from '@http/routes/definitions/auth'
 import { getAuthToken } from '@/utils/auth'
 import { createUser, getUserPublic } from '@/services/user'
-import { AuthResponse } from '@http/definitions/response'
+import { AuthResponse, RoomResponse } from '@http/definitions/response'
 import response from '@http/utils/response'
 
-export async function loginHandler(req: LoginRequest, res: Response) {
-    const room = await getRoomRaw(req.body.roomId)
-
-    if (!room) {
-        return res.sendStatus(404)
-    }
-
-    if (room.pin) {
-        if (req.body.pin) {
-            if (![req.body.pin, getStoragePin(req.body.pin, room.createdAt)].includes(room.pin)) {
-                return res.sendStatus(400)
-            }
-        } else {
-            return res.sendStatus(403)
-        }
-    }
+export async function loginHandler(req: LoginRequest, res: RoomResponse) {
+    const room = res.locals.room
 
     const user = await createUser(req.body.name, req.body.role)
     await joinRoom(room, user.id)
@@ -50,8 +35,7 @@ export async function authHandler(req: Request, res: AuthResponse) {
 }
 
 export async function logoutHandler(req: LogoutRequest, res: AuthResponse) {
-    const room = await getRoomRaw(res.locals.room.id)
-    room && await leaveRoom(room, res.locals.authTokenPayload.user)
+    await leaveRoom(res.locals.room, res.locals.authTokenPayload.user)
 
     res
         .clearCookie('authToken')

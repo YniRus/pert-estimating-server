@@ -1,9 +1,7 @@
-import { TypedRequestBody, TypedRequestQuery } from '@http/definitions/request'
+import { TypedRequestBody } from '@http/definitions/request'
+import { RoomConfig } from '@/definitions/room'
 
 export interface CreateRoomRequest extends TypedRequestBody<{
     pin?: string
-}> {}
-
-export interface GetRoomAccessUrlRequest extends TypedRequestQuery<{
-    roomId: string
+    config?: RoomConfig
 }> {}

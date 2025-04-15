@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { STATUS_CODES } from 'node:http'
+import { error, RequestError } from '@/utils/response'
 
 export default (res: Response) => ({
     success(data: unknown) {
@@ -7,7 +7,6 @@ export default (res: Response) => ({
     },
 
     error(code = 500, message?: string) {
-        res.statusMessage = message ?? STATUS_CODES[code] ?? 'Unknown Error'
-        return res.sendStatus(code)
+        return res.status(code).send(error(new RequestError(code, message)))
     },
 })

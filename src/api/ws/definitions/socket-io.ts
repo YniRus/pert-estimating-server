@@ -6,6 +6,7 @@ import { ErrorResponse } from '@/utils/response'
 import { UserPublic } from '@/definitions/user'
 import { Estimate, Estimates, EstimateType } from '@/definitions/estimates'
 import { RoomInfoContext } from '@ws/handlers/room'
+import { AppData } from '@/definitions/app'
 
 export type SocketMiddlewareNextFunction = (err?: Error) => void
 export type SocketCallbackFunction<T> = (response: T | ErrorResponse) => void
@@ -30,6 +31,7 @@ interface ServerSideEvents {}
 interface SocketData {
     authTokenPayload: AuthTokenPayload
     /* Данные, актуальные только на момент подключение */ room: RoomRaw
+    app: AppData
     silent?: boolean
 }
 

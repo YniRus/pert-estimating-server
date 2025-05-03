@@ -10,8 +10,6 @@ export default function (req: Request, res: Response, next: NextFunction) {
         subspace: typeof subspace === 'string' ? subspace : undefined,
     }
 
-    console.log('Request from: ', app)
-
     res.locals = { ...res.locals, app }
 
     return next()

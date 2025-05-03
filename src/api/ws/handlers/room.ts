@@ -1,10 +1,11 @@
 import { RemoveSocket, Server, Socket, SocketCallbackFunction } from '@ws/definitions/socket-io'
-import { getUser, getUserEstimatesIds, UserEstimatesReturnType } from '@/services/user'
+import useUserService, { UserEstimatesReturnType } from '@/services/user'
 import { Room, RoomRaw } from '@/definitions/room'
 import { UID } from '@/definitions/aliases'
 import { RequestError } from '@/utils/response'
-import { getRoomRaw, getRoomWithActiveUsers, setEstimatesVisible } from '@/services/room'
-import { resetEstimates } from '@/services/estimate'
+import useRoomService from '@/services/room'
+import useEstimateService from '@/services/estimate'
+import { getServiceContext } from '@/utils/context'
 
 type CallbackRoomInfoOptions = {
     withBroadcast?: boolean
@@ -19,6 +20,11 @@ export enum RoomInfoContext {
 }
 
 export default function (io: Server, socket: Socket) {
+    const context = getServiceContext(socket)
+    const roomService = useRoomService(context)
+    const userService = useUserService(context)
+    const estimateService = useEstimateService(context)
+
     async function getActiveRoomSockets() {
         return io.in(socket.data.room.id).fetchSockets()
     }
@@ -37,7 +43,7 @@ export default function (io: Server, socket: Socket) {
         const roomSockets = await getActiveRoomSockets()
         const activeUserIds = getSocketsUserIds(roomSockets)
 
-        callback(await getRoomWithActiveUsers(
+        callback(await roomService.getRoomWithActiveUsers(
             room,
             activeUserIds,
             socket.data.authTokenPayload.user,
@@ -49,7 +55,7 @@ export default function (io: Server, socket: Socket) {
         for (const roomSocket of roomSockets) {
             if (roomSocket.data.authTokenPayload.user === socket.data.authTokenPayload.user) continue
 
-            const roomWithActiveUsers = await getRoomWithActiveUsers(
+            const roomWithActiveUsers = await roomService.getRoomWithActiveUsers(
                 room,
                 activeUserIds,
                 roomSocket.data.authTokenPayload.user,
@@ -66,14 +72,14 @@ export default function (io: Server, socket: Socket) {
                 ? UserEstimatesReturnType.Open
                 : UserEstimatesReturnType.Hidden
 
-            const user = await getUser(socket.data.authTokenPayload.user, estimatesReturnType)
+            const user = await userService.getUser(socket.data.authTokenPayload.user, estimatesReturnType)
             if (user) socket.to(socket.data.room.id).emit('on:user-connected', user)
         },
 
         async getRoomInfo(roomId: UID, callback: SocketCallbackFunction<Room>) {
             if (socket.data.room.id !== roomId) return callback(new RequestError(403).response)
 
-            const room = await getRoomRaw(roomId)
+            const room = await roomService.getRoomRaw(roomId)
             if (!room) return callback(new RequestError(404).response)
 
             await callbackRoomInfo(room, callback, {
@@ -82,10 +88,10 @@ export default function (io: Server, socket: Socket) {
         },
 
         async setRoomEstimatesVisible(estimatesVisible: boolean, callback: SocketCallbackFunction<Room>) {
-            const room = await getRoomRaw(socket.data.room.id)
+            const room = await roomService.getRoomRaw(socket.data.room.id)
             if (!room) return callback(new RequestError(404).response)
 
-            await setEstimatesVisible(room, estimatesVisible)
+            await roomService.setEstimatesVisible(room, estimatesVisible)
 
             await callbackRoomInfo(room, callback, {
                 withBroadcast: true,
@@ -94,15 +100,15 @@ export default function (io: Server, socket: Socket) {
         },
 
         async deleteRoomEstimates(callback: SocketCallbackFunction<Room>) {
-            let room = await getRoomRaw(socket.data.room.id)
+            let room = await roomService.getRoomRaw(socket.data.room.id)
             if (!room) return callback(new RequestError(404).response)
 
             // TODO: New Feature = Дать возможность опционально проставлять Visible при очистке оценок
-            room = await setEstimatesVisible(room, false)
+            room = await roomService.setEstimatesVisible(room, false)
 
-            const estimatesIds = await getUserEstimatesIds(room.users)
+            const estimatesIds = await userService.getUserEstimatesIds(room.users)
             for (const estimatesId of estimatesIds) {
-                await resetEstimates(estimatesId)
+                await estimateService.resetEstimates(estimatesId)
             }
 
             await callbackRoomInfo(room, callback, {

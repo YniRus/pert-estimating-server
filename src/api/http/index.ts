@@ -1,7 +1,8 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
-import appData from '@/api/http/middleware/app'
+import appData from '@/api/http/middleware/app-data'
+import storage from '@/api/http/middleware/storage'
 import cors from 'cors'
 import router from '@http/routes'
 import { createServer } from 'node:http'
@@ -11,11 +12,12 @@ export default function () {
     const app = express()
     const server = createServer(app)
 
-    app.use(appData)
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(cookieParser())
     app.use(cors(getCorsOptions()))
+    app.use(appData)
+    app.use(storage)
     app.use(router)
 
     server.listen(process.env.APP_PORT, () => {

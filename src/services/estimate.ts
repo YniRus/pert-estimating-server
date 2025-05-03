@@ -1,39 +1,10 @@
 import { randomUUID } from 'node:crypto'
-import storage from '@/lib/storage'
 import { Estimate, HIDDEN_ESTIMATE, Estimates, EstimatesRaw, EstimateType } from '@/definitions/estimates'
 import { UID } from '@/definitions/aliases'
-
-export async function createEstimates() {
-    const estimates: EstimatesRaw = getEmptyEstimatesRaw(randomUUID())
-
-    await setEstimateRaw(estimates)
-
-    return estimates
-}
-
-async function getEstimatesRaw(id: UID) {
-    return await storage.getItem<EstimatesRaw>(`estimates:${id}`) || getEmptyEstimatesRaw(id)
-}
-
-function getEmptyEstimatesRaw(id: UID): EstimatesRaw {
-    return {
-        id,
-        estimates: getEmptyEstimates(),
-    }
-}
+import { ServiceContext } from '@/definitions/context'
 
 export function getEmptyEstimates(): Estimates {
     return {}
-}
-
-export async function getEstimates(id: UID, open?: boolean) {
-    const estimates = await getEstimatesRaw(id)
-
-    if (!open) {
-        estimates.estimates = hideEstimates(estimates.estimates)
-    }
-
-    return estimates.estimates
 }
 
 export function hideEstimates(estimates: Estimates): Estimates {
@@ -43,19 +14,50 @@ export function hideEstimates(estimates: Estimates): Estimates {
     )
 }
 
-async function setEstimateRaw(estimates: EstimatesRaw) {
-    await storage.setItem(`estimates:${estimates.id}`, estimates)
-    return estimates
+function getEmptyEstimatesRaw(id: UID): EstimatesRaw {
+    return {
+        id,
+        estimates: getEmptyEstimates(),
+    }
 }
 
-export async function setEstimate(id: UID, type: EstimateType, estimate: Estimate) {
-    const estimates = await getEstimatesRaw(id)
+export default ({ storage }: ServiceContext) => ({
+    async createEstimates() {
+        const estimates: EstimatesRaw = getEmptyEstimatesRaw(randomUUID())
 
-    estimates.estimates[type] = estimate
+        await this.setEstimateRaw(estimates)
 
-    return (await setEstimateRaw(estimates)).estimates
-}
+        return estimates
+    },
 
-export async function resetEstimates(id: UID) {
-    await setEstimateRaw(getEmptyEstimatesRaw(id))
-}
+    async getEstimatesRaw(id: UID) {
+        return await storage.getItem<EstimatesRaw>(`estimates:${id}`) || getEmptyEstimatesRaw(id)
+    },
+
+    async getEstimates(id: UID, open?: boolean) {
+        const estimates = await this.getEstimatesRaw(id)
+
+        if (!open) {
+            estimates.estimates = hideEstimates(estimates.estimates)
+        }
+
+        return estimates.estimates
+    },
+
+    async setEstimateRaw(estimates: EstimatesRaw) {
+        await storage.setItem(`estimates:${estimates.id}`, estimates)
+        return estimates
+    },
+
+    async setEstimate(id: UID, type: EstimateType, estimate: Estimate) {
+        const estimates = await this.getEstimatesRaw(id)
+
+        estimates.estimates[type] = estimate
+
+        return (await this.setEstimateRaw(estimates)).estimates
+    },
+
+    async resetEstimates(id: UID) {
+        await this.setEstimateRaw(getEmptyEstimatesRaw(id))
+    },
+})

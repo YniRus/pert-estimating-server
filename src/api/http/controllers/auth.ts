@@ -1,16 +1,18 @@
 import { Request } from 'express'
-import { joinRoom, leaveRoom } from '@/services/room'
+import useRoomService from '@/services/room'
 import { LoginRequest, LogoutRequest } from '@http/routes/definitions/auth'
 import { getAuthToken } from '@/utils/auth'
-import { createUser, getUserPublic } from '@/services/user'
+import useUserService from '@/services/user'
 import { AuthResponse, RoomResponse } from '@http/definitions/response'
 import response from '@http/utils/response'
+import { getServiceContext } from '@/utils/context'
 
 export async function loginHandler(req: LoginRequest, res: RoomResponse) {
     const room = res.locals.room
 
-    const user = await createUser(req.body.name, req.body.role)
-    await joinRoom(room, user.id)
+    const context = getServiceContext(res)
+    const user = await useUserService(context).createUser(req.body.name, req.body.role)
+    await useRoomService(context).joinRoom(room, user.id)
 
     const authToken = getAuthToken({
         user: user.id,
@@ -25,7 +27,8 @@ export async function loginHandler(req: LoginRequest, res: RoomResponse) {
 }
 
 export async function authHandler(req: Request, res: AuthResponse) {
-    const user = await getUserPublic(res.locals.authTokenPayload.user)
+    const context = getServiceContext(res)
+    const user = await useUserService(context).getUserPublic(res.locals.authTokenPayload.user)
     if (!user) return res.sendStatus(404)
 
     response(res).success({
@@ -35,7 +38,8 @@ export async function authHandler(req: Request, res: AuthResponse) {
 }
 
 export async function logoutHandler(req: LogoutRequest, res: AuthResponse) {
-    await leaveRoom(res.locals.room, res.locals.authTokenPayload.user)
+    const context = getServiceContext(res)
+    await useRoomService(context).leaveRoom(res.locals.room, res.locals.authTokenPayload.user)
 
     res
         .clearCookie('authToken')

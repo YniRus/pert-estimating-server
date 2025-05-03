@@ -3,7 +3,8 @@ import { Server as HttpServer } from 'node:http'
 import { Socket } from '@ws/definitions/socket-io'
 import cookieParser from '@ws/middleware/cookie-parser'
 import auth from '@ws/middleware/auth'
-import app from '@ws/middleware/app'
+import appData from '@ws/middleware/app-data'
+import storage from '@ws/middleware/storage'
 import useServiceListeners from '@ws/listeners/service'
 import useRoomListeners from '@ws/listeners/room'
 import useEstimatesListeners from '@ws/listeners/estimates'
@@ -15,8 +16,9 @@ export default function (server: HttpServer) {
         path: '/io',
     })
 
-    io.use(app)
     io.use(cookieParser)
+    io.use(appData)
+    io.use(storage)
     io.use(auth)
 
     io.on('connection', (socket: Socket) => {

@@ -1,20 +1,14 @@
 import { Room, RoomConfig, RoomPublic, RoomRaw } from '@/definitions/room'
 import { randomUUID } from 'node:crypto'
 import { getStoragePin } from '@/utils/room'
-import storage from '@/lib/storage'
 import { UID } from '@/definitions/aliases'
-import { getUser, UserEstimatesReturnType } from '@/services/user'
+import useUserService, { UserEstimatesReturnType } from '@/services/user'
 import { truthy } from '@/utils/utils'
+import { ServiceContext } from '@/definitions/context'
 
-export async function getRoomRaw(id: UID) {
-    return await storage.getItem<RoomRaw>(`rooms:${id}`)
-}
-
-export async function getRoomPublic(id: UID): Promise<RoomPublic | null> {
-    const room = await getRoomRaw(id)
-    if (!room) return null
-
-    return getRoomPublicByRaw(room)
+export interface GetRoomWithActiveUsersOptions {
+    withEmptyEstimates?: boolean
+    withConfig?: boolean
 }
 
 function getRoomPublicByRaw(room: RoomRaw): RoomPublic {
@@ -26,67 +20,75 @@ function getRoomPublicByRaw(room: RoomRaw): RoomPublic {
     }
 }
 
-export interface GetRoomWithActiveUsersOptions {
-    withEmptyEstimates?: boolean
-    withConfig?: boolean
-}
+export default ({ storage }: ServiceContext) => ({
+    async getRoomRaw(id: UID) {
+        return await storage.getItem<RoomRaw>(`rooms:${id}`)
+    },
 
-export async function getRoomWithActiveUsers(
-    room: RoomRaw,
-    activeUserIds: UID[],
-    authUserId: UID,
-    options?: GetRoomWithActiveUsersOptions,
-): Promise<Room> {
-    const { withEmptyEstimates = false, withConfig = false } = options || {}
+    async getRoomPublic(id: UID): Promise<RoomPublic | null> {
+        const room = await this.getRoomRaw(id)
+        if (!room) return null
 
-    const estimatesReturnType = (userId: string) => {
-        if (withEmptyEstimates) return UserEstimatesReturnType.Empty
-        if (room.estimatesVisible || userId === authUserId) return UserEstimatesReturnType.Open
-        return UserEstimatesReturnType.Hidden
-    }
+        return getRoomPublicByRaw(room)
+    },
 
-    const users = (await Promise.all(room.users
-        .filter((userId) => activeUserIds.includes(userId))
-        .map((userId) => getUser(userId, estimatesReturnType(userId))),
-    )).filter(truthy)
+    async getRoomWithActiveUsers(
+        room: RoomRaw,
+        activeUserIds: UID[],
+        authUserId: UID,
+        options?: GetRoomWithActiveUsersOptions,
+    ): Promise<Room> {
+        const { withEmptyEstimates = false, withConfig = false } = options || {}
 
-    const roomPublic = getRoomPublicByRaw(room)
-    if (!withConfig) delete roomPublic.config
+        const estimatesReturnType = (userId: string) => {
+            if (withEmptyEstimates) return UserEstimatesReturnType.Empty
+            if (room.estimatesVisible || userId === authUserId) return UserEstimatesReturnType.Open
+            return UserEstimatesReturnType.Hidden
+        }
 
-    return { ...roomPublic, users }
-}
+        const users = (await Promise.all(room.users
+            .filter((userId) => activeUserIds.includes(userId))
+            .map((userId) => useUserService({ storage }).getUser(userId, estimatesReturnType(userId))),
+        )).filter(truthy)
 
-export async function createRoom(pin?: string, config?: RoomConfig) {
-    const room: RoomRaw = {
-        id: randomUUID(),
-        users: [],
-        createdAt: Date.now(),
-        config, // TODO: validate config
-    }
+        const roomPublic = getRoomPublicByRaw(room)
+        if (!withConfig) delete roomPublic.config
 
-    if (pin) {
-        room.pin = getStoragePin(pin, room.createdAt)
-    }
+        return { ...roomPublic, users }
+    },
 
-    return await setRoomRaw(room)
-}
+    async createRoom(pin?: string, config?: RoomConfig) {
+        const room: RoomRaw = {
+            id: randomUUID(),
+            users: [],
+            createdAt: Date.now(),
+            config, // TODO: validate config
+        }
 
-export async function setEstimatesVisible(room: RoomRaw, estimatesVisible: boolean) {
-    room.estimatesVisible = estimatesVisible
-    return await setRoomRaw(room)
-}
+        if (pin) {
+            room.pin = getStoragePin(pin, room.createdAt)
+        }
 
-export async function joinRoom(room: RoomRaw, userId: UID) {
-    room.users.push(userId)
-    return await setRoomRaw(room)
-}
+        return await this.setRoomRaw(room)
+    },
 
-export async function leaveRoom(room: RoomRaw, userId: UID) {
-    room.users = room.users.filter((user) => user !== userId)
-    return await setRoomRaw(room)
-}
+    async setEstimatesVisible(room: RoomRaw, estimatesVisible: boolean) {
+        room.estimatesVisible = estimatesVisible
+        return await this.setRoomRaw(room)
+    },
 
-async function setRoomRaw(room: RoomRaw) {
-    await storage.setItem(`rooms:${room.id}`, room)
-    return room
-}
+    async joinRoom(room: RoomRaw, userId: UID) {
+        room.users.push(userId)
+        return await this.setRoomRaw(room)
+    },
+
+    async leaveRoom(room: RoomRaw, userId: UID) {
+        room.users = room.users.filter((user) => user !== userId)
+        return await this.setRoomRaw(room)
+    },
+
+    async setRoomRaw(room: RoomRaw) {
+        await storage.setItem(`rooms:${room.id}`, room)
+        return room
+    },
+})

@@ -1,0 +1,10 @@
+services:
+    app:
+        build: .
+        ports:
+            - "${APP_PORT}:${APP_PORT}"
+        volumes:
+            - ./src:/app/src
+        command: npm run docker:dev
+        environment:
+            - NODE_ENV=development

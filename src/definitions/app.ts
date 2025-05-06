@@ -1,4 +1,4 @@
 export interface AppData {
-    namespace?: string
-    subspace?: string
+    namespace: string
+    subspace: string
 }

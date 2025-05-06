@@ -3,10 +3,7 @@ import { SocketMiddlewareNextFunction } from '@ws/definitions/socket-io'
 import baseStorage, { prefixStorage } from '@/lib/storage'
 
 export default function (socket: Socket, next: SocketMiddlewareNextFunction) {
-    const {
-        namespace = process.env.APP_NAMESPACE || '_default',
-        subspace = process.env.APP_SUBSPACE || '_default',
-    } = socket.data.app
+    const { namespace, subspace } = socket.data.app
 
     let storage = baseStorage
 

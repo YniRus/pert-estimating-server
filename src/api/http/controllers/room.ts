@@ -5,6 +5,7 @@ import useRoomService from '@/services/room'
 import response from '@http/utils/response'
 import { AuthResponse, BaseResponse, RoomResponse } from '@http/definitions/response'
 import { getServiceContext } from '@/utils/context'
+import { getRequestOrigin } from '@http/utils/request'
 
 export async function getIsRoomAccessAvailableHandler(req: Request, res: RoomResponse) {
     response(res).success(true)
@@ -19,5 +20,5 @@ export async function createRoomHandler(req: CreateRoomRequest, res: BaseRespons
 }
 
 export async function getRoomAccessUrlHandler(req: Request, res: AuthResponse) {
-    response(res).success({ accessUrl: getRoomAccessUrl(res.locals.room, req.get('origin')) })
+    response(res).success({ accessUrl: getRoomAccessUrl(res.locals.room, getRequestOrigin(req)) })
 }

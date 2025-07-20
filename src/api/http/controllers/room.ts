@@ -7,16 +7,20 @@ import { AuthResponse, BaseResponse, RoomResponse } from '@http/definitions/resp
 import { getServiceContext } from '@/utils/context'
 import { getRequestOrigin } from '@http/utils/request'
 
-export async function getIsRoomAccessAvailableHandler(req: Request, res: RoomResponse) {
-    response(res).success(true)
-}
-
 export async function createRoomHandler(req: CreateRoomRequest, res: BaseResponse) {
     const context = getServiceContext(res)
 
     useRoomService(context).createRoom(req.body.pin, req.body.config)
         .then((room) => response(res).success({ accessUrl: getRoomAccessUrl(room, req.get('origin')) }))
         .catch((error: Error) => response(res).error(500, error.message))
+}
+
+export async function getIsRoomAccessAvailableHandler(req: Request, res: RoomResponse) {
+    response(res).success(true)
+}
+
+export async function getRoomConfigHandler(req: Request, res: RoomResponse) {
+    response(res).success({ config: res.locals.room.config })
 }
 
 export async function getRoomAccessUrlHandler(req: Request, res: AuthResponse) {

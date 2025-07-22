@@ -34,4 +34,9 @@ export type Estimates = Partial<Record<EstimateType, Estimate | typeof HIDDEN_ES
 export interface EstimatesRaw {
     id: UID
     estimates: Estimates
+    confirmed?: boolean
 }
+
+export interface EstimatesPublic extends Omit<EstimatesRaw, 'id'> {}
+
+export interface UserEstimates extends EstimatesPublic {}

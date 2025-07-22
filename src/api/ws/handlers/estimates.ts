@@ -15,18 +15,28 @@ export default function (io: Server, socket: Socket) {
             const room = await roomService.getRoomRaw(socket.data.room.id)
             if (!room) return callback(new RequestError(404).response)
 
-            let estimates = await estimateService.setEstimate(
+            const estimates = await estimateService.setEstimate(
                 socket.data.authTokenPayload.estimates,
                 type,
                 estimate,
             )
 
             if (!room.estimatesVisible) {
-                estimates = hideEstimates(estimates)
+                estimates.estimates = hideEstimates(estimates.estimates)
             }
 
             if (socket.rooms.has(socket.data.room.id)) {
-                socket.to(socket.data.room.id).emit('on:estimates', socket.data.authTokenPayload.user, estimates)
+                socket.to(socket.data.room.id).emit('on:estimates', socket.data.authTokenPayload.user, estimates.estimates)
+            }
+
+            callback(true)
+        },
+
+        async confirmEstimates(confirmed: boolean, callback: SocketCallbackFunction<true>) {
+            const estimates = await estimateService.setEstimatesConfirmed(socket.data.authTokenPayload.estimates, confirmed)
+
+            if (socket.rooms.has(socket.data.room.id)) {
+                socket.to(socket.data.room.id).emit('on:estimates-confirm', socket.data.authTokenPayload.user, !!estimates.confirmed)
             }
 
             callback(true)

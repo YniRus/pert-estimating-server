@@ -1,5 +1,12 @@
 import { randomUUID } from 'node:crypto'
-import { Estimate, HIDDEN_ESTIMATE, Estimates, EstimatesRaw, EstimateType } from '@/definitions/estimates'
+import {
+    Estimate,
+    HIDDEN_ESTIMATE,
+    Estimates,
+    EstimatesRaw,
+    EstimateType,
+    EstimatesPublic,
+} from '@/definitions/estimates'
 import { UID } from '@/definitions/aliases'
 import { ServiceContext } from '@/definitions/context'
 
@@ -34,14 +41,14 @@ export default ({ storage }: ServiceContext) => ({
         return await storage.getItem<EstimatesRaw>(`estimates:${id}`) || getEmptyEstimatesRaw(id)
     },
 
-    async getEstimates(id: UID, open?: boolean) {
+    async getEstimatesPublic(id: UID): Promise<EstimatesPublic> {
         const estimates = await this.getEstimatesRaw(id)
 
-        if (!open) {
-            estimates.estimates = hideEstimates(estimates.estimates)
+        if (estimates) {
+            delete (estimates as Partial<EstimatesRaw>).id
         }
 
-        return estimates.estimates
+        return estimates
     },
 
     async setEstimateRaw(estimates: EstimatesRaw) {
@@ -54,7 +61,15 @@ export default ({ storage }: ServiceContext) => ({
 
         estimates.estimates[type] = estimate
 
-        return (await this.setEstimateRaw(estimates)).estimates
+        return await this.setEstimateRaw(estimates)
+    },
+
+    async setEstimatesConfirmed(id: UID, confirmed: boolean) {
+        const estimates = await this.getEstimatesRaw(id)
+
+        estimates.confirmed = confirmed
+
+        return await this.setEstimateRaw(estimates)
     },
 
     async resetEstimates(id: UID) {

@@ -13,6 +13,7 @@ export interface RoomRaw {
 
 export interface RoomConfig {
     estimateVariants?: EstimateVariant[]
+    withConfirmEstimates?: boolean
 }
 
 export interface RoomPublic extends Omit<RoomRaw, 'pin' | 'createdAt'> {}

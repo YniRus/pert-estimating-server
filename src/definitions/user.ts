@@ -1,5 +1,5 @@
 import { UID } from '@/definitions/aliases'
-import { Estimates } from '@/definitions/estimates'
+import { UserEstimates } from '@/definitions/estimates'
 
 export enum UserRole {
     Dev = 'dev',
@@ -16,5 +16,5 @@ export interface UserRaw {
 export interface UserPublic extends Omit<UserRaw, 'estimates'> {}
 
 export interface User extends Omit<UserRaw, 'estimates'> {
-    estimates?: Estimates
+    estimates?: UserEstimates
 }

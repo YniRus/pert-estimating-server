@@ -5,4 +5,5 @@ export default function (io: Server, socket: Socket) {
     const handler = estimatesHandler(io, socket)
 
     socket.on('mutation:estimate', handler.setEstimate)
+    socket.on('mutation:estimates-confirm', handler.confirmEstimates)
 }

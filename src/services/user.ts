@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { User, UserPublic, UserRaw, UserRole } from '@/definitions/user'
 import { UID } from '@/definitions/aliases'
-import useEstimateService, { getEmptyEstimates } from '@/services/estimate'
+import useEstimateService from '@/services/estimate'
+import useUserEstimateService from '@/services/user-estimate'
 import { truthy } from '@/utils/utils'
 import { ServiceContext } from '@/definitions/context'
 
@@ -43,9 +44,8 @@ export default ({ storage }: ServiceContext) => ({
         const user = await this.getUserRaw(id)
         if (!user) return user
 
-        const estimates = estimatesReturnType === UserEstimatesReturnType.Empty
-            ? getEmptyEstimates()
-            : await useEstimateService({ storage }).getEstimates(user.estimates, estimatesReturnType === UserEstimatesReturnType.Open)
+        const estimates = await useUserEstimateService({ storage })
+            .getUserEstimates(user.estimates, estimatesReturnType)
 
         return { ...user, estimates }
     },

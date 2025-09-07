@@ -11,15 +11,13 @@ export default function (io: Server, socket: Socket) {
     const estimateService = useEstimateService(context)
 
     return {
-        async setEstimate(type: EstimateType, estimate: Estimate, callback: SocketCallbackFunction<true>) {
+        async setEstimate(type: EstimateType, estimate: Estimate | null, callback: SocketCallbackFunction<true>) {
             const room = await roomService.getRoomRaw(socket.data.room.id)
             if (!room) return callback(new RequestError(404).response)
 
-            const estimates = await estimateService.setEstimate(
-                socket.data.authTokenPayload.estimates,
-                type,
-                estimate,
-            )
+            const estimates = estimate
+                ? await estimateService.setEstimate(socket.data.authTokenPayload.estimates, type, estimate)
+                : await estimateService.resetEstimate(socket.data.authTokenPayload.estimates, type)
 
             if (!room.estimatesVisible) {
                 estimates.estimates = hideEstimates(estimates.estimates)

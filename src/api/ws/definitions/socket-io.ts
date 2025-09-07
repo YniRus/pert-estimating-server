@@ -22,7 +22,7 @@ interface ServerToClientEvents {
 
 interface ClientToServerEvents {
     'query:room': (room: UID, callback: SocketCallbackFunction<Room>) => void
-    'mutation:estimate': (type: EstimateType, estimate: Estimate, callback: SocketCallbackFunction<true>) => void
+    'mutation:estimate': (type: EstimateType, estimate: Estimate | null, callback: SocketCallbackFunction<true>) => void
     'mutation:estimates-confirm': (confirmed: boolean, callback: SocketCallbackFunction<true>) => void
     'mutation:room-estimates-visible': (estimatesVisible: boolean, callback: SocketCallbackFunction<RoomWithoutConfig>) => void
     'mutation:room-delete-estimates': (callback: SocketCallbackFunction<RoomWithoutConfig>) => void

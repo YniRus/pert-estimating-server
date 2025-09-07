@@ -1,6 +1,6 @@
 {
     "name": "pert-pocker",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "main": "dist/index.js",
     "private": true,
     "type": "module",

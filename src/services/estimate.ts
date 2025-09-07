@@ -64,6 +64,14 @@ export default ({ storage }: ServiceContext) => ({
         return await this.setEstimateRaw(estimates)
     },
 
+    async resetEstimate(id: UID, type: EstimateType) {
+        const estimates = await this.getEstimatesRaw(id)
+
+        delete estimates.estimates[type]
+
+        return await this.setEstimateRaw(estimates)
+    },
+
     async setEstimatesConfirmed(id: UID, confirmed: boolean) {
         const estimates = await this.getEstimatesRaw(id)
 
